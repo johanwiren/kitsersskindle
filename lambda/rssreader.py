@@ -17,16 +17,28 @@ TABLE = boto.dynamodb2.table.Table('rssfeedkindle-dynamoDbTable-IWHWI0I2NY0K',
             aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
             security_token=os.environ.get('AWS_SESSION_TOKEN',None)))
 
+def filter_item(feed_item):
+    NOT_WANTED = [
+            'Hobbies and Interests',
+            'Makeup',
+            'Home and Garden',
+            'Food and Drink',
+            'Recipes',
+            ]
+    for tag in feed_item['tags']:
+        if tag in NOT_WANTED:
+            return False
+    return True
+
 
 def get_feed_links(url):
     feed = feedparser.parse(url)
-    return [x.link for x in feed.entries]
+    return [x.link for x in feed.entries if filter_item(x)]
 
 
 def get_new_links(links):
     return [new_link for new_link in [
         link for link in links if not TABLE.has_item(itemId=link)]]
-
 
 def handle_feed(url):
     ses = boto.ses.connect_to_region(
