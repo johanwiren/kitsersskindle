@@ -1,3 +1,4 @@
 virtualenv
 dist
 .semaphores
+awsresources.py
