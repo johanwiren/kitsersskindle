@@ -1,7 +1,8 @@
 ZIPFILE := $(PWD)/dist/rssreader.zip
-S3_BUCKET := "johanwiren-lambda"
-S3_KEY := "rssfeedkindle/rssreader.zip"
-LAMBDA_FUNCTION_NAME := "rssfeedkindle-lambdaFunction-8TIMDLIRJHA"
+STACK_NAME := rssfeedkindle
+S3_BUCKET := johanwiren-lambda
+S3_KEY := $(STACK_NAME)/rssreader.zip
+LAMBDA_FUNCTION_NAME = $(shell aws cloudformation list-stack-resources --stack-name $(STACK_NAME) | jq '.StackResourceSummaries[] | select(.LogicalResourceId == "lambdaFunction").PhysicalResourceId')
 
 .PHONY: all s3push lambda cf
 all: .semaphores s3push cf lambda
