@@ -38,8 +38,7 @@ def entry_is_wanted(entry):
     return True
 
 
-def handle_feed(url):
-    feed = feedparser.parse(url)
+def handle_feed(feed):
     ses = boto.ses.connect_to_region(
             'eu-west-1',
             aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
@@ -63,7 +62,8 @@ def handle_feed(url):
 
 
 def lambda_handler(event, context):
-    return handle_feed('https://kit.se/feed')
+    feed = feedparser.parse('https://kit.se/feed')
+    return handle_feed(feed)
 
 
 if __name__ == '__main__':
