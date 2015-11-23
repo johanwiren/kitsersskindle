@@ -3,6 +3,7 @@ STACK_NAME := rssfeedkindle
 S3_BUCKET := johanwiren-lambda
 S3_KEY := $(STACK_NAME)/rssreader.zip
 LAMBDA_FUNCTION_NAME = $(shell aws cloudformation list-stack-resources --stack-name $(STACK_NAME) | jq '.StackResourceSummaries[] | select(.LogicalResourceId == "lambdaFunction").PhysicalResourceId')
+DYNAMODB_TABLE_NAME = $(shell aws cloudformation list-stack-resources --stack-name $(STACK_NAME) | jq '.StackResourceSummaries[] | select(.LogicalResourceId == "dynamoDbTable").PhysicalResourceId')
 
 .PHONY: all s3push lambda cf
 all: .semaphores s3push cf lambda
@@ -13,9 +14,12 @@ cf: .semaphores/cf
 .semaphores:
 	mkdir $@
 
-$(ZIPFILE): rssreader.py dist virtualenv requirements.txt
+awsresources.py:
+	echo dynamodb_table = \"$(DYNAMODB_TABLE_NAME)\" > $@
+
+$(ZIPFILE): rssreader.py awsresources.py dist virtualenv requirements.txt
 	rm -f dist/rssreader.zip
-	zip dist/rssreader.zip rssreader.py
+	zip dist/rssreader.zip rssreader.py awsresources.py
 	cd virtualenv/lib/python2.7/site-packages/; zip -r $(ZIPFILE) -r .
 
 .semaphores/lambda: .semaphores/s3push

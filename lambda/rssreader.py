@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
+import awsresources
 import feedparser
 import boto.dynamodb2
 import boto.dynamodb2.table
 import boto.ses
 import os
 
-
 SENDER_EMAIL = 'johan@johanwiren.se'
 RECIPIENT_EMAIL = 'johan.wiren.se_65@pushtokindle.com'
 
-TABLE = boto.dynamodb2.table.Table('rssfeedkindle-dynamoDbTable-IWHWI0I2NY0K',
+TABLE = boto.dynamodb2.table.Table(awsresources.dynamodb_table,
         connection=boto.dynamodb2.connect_to_region(
             'eu-west-1',
             aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
@@ -68,4 +68,6 @@ def lambda_handler(event, context):
 
 if __name__ == '__main__':
     import sys
-    print handle_feed(sys.argv[1])
+    import json
+    feed = feedparser.parse(sys.argv[1])
+    print json.dumps(handle_feed(feed), indent=2)
