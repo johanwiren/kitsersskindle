@@ -73,7 +73,6 @@ class KitseRssHandler(object):
                     'Kit.se RSS - Delivery status',
                     body,
                     [self.SENDER_EMAIL])
-            print "Sent statusmail"
 
     def handle_feed(self):
         feed = self.feed
