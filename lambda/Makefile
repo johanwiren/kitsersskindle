@@ -10,12 +10,19 @@ all: .semaphores s3push cf lambda
 s3push: .semaphores/s3push
 lambda: .semaphores/lambda
 cf: .semaphores/cf
+virtualenv: virtualenv/lib/python2.7/site-packages
 
 .semaphores:
 	mkdir $@
 
 awsresources.py:
 	echo dynamodb_table = \"$(DYNAMODB_TABLE_NAME)\" > $@
+
+virtualenv/bin/pip:
+	virtualenv virtualenv
+
+virtualenv/lib/python2.7/site-packages: virtualenv/bin/pip requirements.txt
+	virtualenv/bin/pip install -r requirements.txt --upgrade
 
 $(ZIPFILE): rssreader.py awsresources.py dist virtualenv requirements.txt
 	rm -f dist/rssreader.zip
